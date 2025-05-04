@@ -1,0 +1,5 @@
+# .markdownlint-cli2.yaml
+---
+extends: markdownlint-cli2/style/all.yaml
+config:
+  MD013: false
