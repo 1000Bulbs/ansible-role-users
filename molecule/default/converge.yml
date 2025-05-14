@@ -15,10 +15,17 @@
       ansible.builtin.set_fact:
         users_list:
           - username: deploy
+            comment: Deploy user
+            ssh_keys:
+              - ssh-ed25519 AAAAC3NzaC1 user1@email.com
+              - ssh-ed25519 AAAAC3NzaC2 user2@email.com
+              - ssh-ed25519 AAAAC3NzaC3 user3@email.com
 
           - username: devops
             groups:
               - sudo
+            ssh_keys:
+              - ssh-ed25519 AAAAC3NzaC1 user1@email.com
 
   roles:
     - { role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}" }

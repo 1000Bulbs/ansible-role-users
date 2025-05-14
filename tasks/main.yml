@@ -25,3 +25,29 @@
   loop: "{{ users_list }}"
   loop_control:
     label: "{{ item.username }}"
+
+- name: Ensure ~/.ssh directory exists for users with ssh_keys
+  ansible.builtin.file:
+    path: "{{ item.home | default(users_home ~ '/' ~ item.username) }}/.ssh"
+    owner: "{{ item.username }}"
+    group: "{{ item.group | default(item.username) }}"
+    state: directory
+    mode: "0700"
+  when: item.ssh_keys is defined
+  loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
+
+- name: Create authorized_keys file from template
+  ansible.builtin.template:
+    src: authorized_keys.j2
+    dest: "{{ item.home | default(users_home ~ '/' ~ item.username) }}/.ssh/authorized_keys"
+    owner: "{{ item.username }}"
+    group: "{{ item.group | default(item.username) }}"
+    mode: "0600"
+  when: item.ssh_keys is defined
+  loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
+  vars:
+    ssh_keys: "{{ item.ssh_keys }}"
