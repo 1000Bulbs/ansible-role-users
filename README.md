@@ -2,7 +2,17 @@
 
 [![CI](https://github.com/1000Bulbs/ansible-role-users/actions/workflows/ci.yml/badge.svg)](https://github.com/1000Bulbs/ansible-role-users/actions/workflows/ci.yml)
 
-A brief description of the role goes here.
+This role manages Linux system users on Debian-based systems (e.g., Ubuntu 22.04+). It creates users, sets up their primary and secondary groups, manages home directories and login shells, and supports default or custom configurations.
+
+It handles:
+
+- Validating usernames
+
+- Creating user accounts with optional comments, shells, and home directories
+
+- Managing primary and secondary group membership
+
+- Applying default configuration if specific attributes (e.g., shell, groups) are not provided
 
 ---
 
@@ -20,18 +30,37 @@ These variables can be overridden in your inventory, playbooks, or `group_vars`.
 
 ### Defaults (`defaults/main.yml`)
 
-Add a list of default variables that are defined in the role's `defaults/main.yml` file.
+```yaml
+users_list: []                                        # List of users to create
+users_home: /home                                     # Base home directory
+users_groups: []                                      # Default secondary groups
+users_shell: /bin/bash                                # Default shell
+```
 
 ### Variables (`vars/main.yml`)
 
 _No variables defined._
 
+### User management (users_list)
+
+Each item supports:
+
+| Key      | Type   | Description                                         |
+| -------- | ------ | --------------------------------------------------- |
+| username | string | The system username                                 |
+| comment  | string | Optional GECOS comment (user full name or note)     |
+| home     | string | Optional home directory (default is `/home/<user>`) |
+| shell    | string | Optional shell (default is `/bin/bash`)             |
+| group    | string | Optional primary group (default is username)        |
+| groups   | list   | Optional additional groups                          |
+
+---
+
 ---
 
 ## 📦 Dependencies
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be
-set for other roles, or variables that are used from other roles.
+No external roles or collections required.
 
 ---
 
@@ -41,7 +70,7 @@ To include this role in your project using a `requirements.yml` file:
 
 ```yaml
 roles:
-  - name: users
+  - name: okb.users
     src: git@github.com:1000bulbs/ansible-role-users.git
     scm: git
     version: master
@@ -57,15 +86,21 @@ ansible-galaxy role install -r requirements.yml
 
 ## 💡 Example Playbook
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for
-users too:
-
 ```yaml
-- name: My Playbook
+- name: Create system users
   hosts: all
   become: true
+  vars:
+    users_list:
+      - username: deploy
+        comment: Deployment User
+
+      - username: devops
+        comment: DevOps User
+        groups:
+          - sudo
   roles:
-    - role: users
+    - role: okb.users
 ```
 
 ---
