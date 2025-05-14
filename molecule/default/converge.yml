@@ -11,5 +11,14 @@
       register: apt_cache_update
       when: ansible_os_family == "Debian"
 
+    - name: Set users_to_add
+      ansible.builtin.set_fact:
+        users_list:
+          - username: deploy
+
+          - username: devops
+            groups:
+              - sudo
+
   roles:
     - { role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}" }

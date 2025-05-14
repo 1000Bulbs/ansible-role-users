@@ -1,3 +1,13 @@
 # molecule/default/vars/all.yml
 ---
-test_file: /etc
+users_list:
+  - username: deploy
+  - username: devops
+    groups:
+      - sudo
+
+users_home: /home
+
+users_groups: []
+
+users_shell: /bin/bash

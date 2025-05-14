@@ -1,2 +1,9 @@
 # defaults/main.yml
 ---
+users_list: []
+
+users_home: /home
+
+users_groups: []
+
+users_shell: /bin/bash

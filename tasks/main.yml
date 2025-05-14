@@ -1,2 +1,27 @@
 # tasks/main.yml
 ---
+- name: Validate that all users have a valid name
+  ansible.builtin.assert:
+    that:
+      - item.username is defined
+      - item.username | string | length > 0
+      - item.username is match('^[a-z][a-z0-9_-]*$')
+    fail_msg: >
+      Each user must start with a lowercase letter, followed by
+      lowercase letters, digits, underscores, or dashes.
+  loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
+
+- name: Add users
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    comment: "{{ item.comment | default(omit) }}"
+    create_home: "{{ item.create_home | default(omit) }}"
+    group: "{{ (item.group is defined and item.group != item.username) | ternary(item.group, omit) }}"
+    groups: "{{ item.groups | default(users_groups) | join(',') }}"
+    home: "{{ item.home | default(users_home ~ '/' ~ item.username) }}"
+    shell: "{{ item.shell | default(users_shell) }}"
+  loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
