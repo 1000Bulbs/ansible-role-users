@@ -25,3 +25,29 @@
     groups: "{{ item.groups | default(users_groups) | join(',') }}"
     home: "{{ item.home | default(users_home ~ '/' ~ item.username) }}"
     shell: "{{ item.shell | default(users_shell) }}"
+
+- name: Ensure user ssh directory
+  when: item.ssh_keys is defined
+  loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
+  ansible.builtin.file:
+    path: "{{ item.home | default(users_home ~ '/' ~ item.username) }}/.ssh"
+    owner: "{{ item.username }}"
+    group: "{{ item.group | default(item.username) }}"
+    state: directory
+    mode: "0700"
+
+- name: Ensure user ssh authorized_keys file
+  when: item.ssh_keys is defined
+  loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
+  vars:
+    ssh_keys: "{{ item.ssh_keys }}"
+  ansible.builtin.template:
+    src: authorized_keys.j2
+    dest: "{{ item.home | default(users_home ~ '/' ~ item.username) }}/.ssh/authorized_keys"
+    owner: "{{ item.username }}"
+    group: "{{ item.group | default(item.username) }}"
+    mode: "0600"
