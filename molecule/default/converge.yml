@@ -1,0 +1,7 @@
+# molecule/default/converge.yml
+---
+- name: Converge
+  hosts: all
+
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"

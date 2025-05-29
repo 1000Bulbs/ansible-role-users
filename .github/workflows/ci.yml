@@ -1,0 +1,91 @@
+# .github/workflows/ci.yml
+---
+name: CI
+
+"on":
+  pull_request:
+    paths-ignore:
+      - README.md
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - README.md
+  schedule:
+    - cron: 0 2 * * 0
+
+jobs:
+  lint:
+    name: Lint tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+
+      - name: Install lint dependencies
+        run: make install-lint-deps
+
+      - name: Run linters
+        run: make lint
+
+  format:
+    name: Format tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install format dependencies
+        run: make install-format-deps
+
+      - name: Run formatters
+        run: make format
+
+  molecule:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    needs:
+      - lint
+      - format
+
+    strategy:
+      matrix:
+        distro:
+          - ubuntu-2204
+          - ubuntu-2404
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install molecule dependencies
+        run: make install-molecule-deps
+
+      - name: Run molecule tests
+        run: make test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          MOLECULE_DISTRO: ${{ matrix.distro }}
