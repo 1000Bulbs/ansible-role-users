@@ -5,3 +5,9 @@
 
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+      vars:
+        users_list:
+          - username: deploy
+          - username: devops
+            groups:
+              - sudo

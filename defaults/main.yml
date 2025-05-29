@@ -1,2 +1,13 @@
 # defaults/main.yml
 ---
+# List of user accounts to be managed
+users_list: []
+
+# Base directory for user home folders
+users_home: /home
+
+# List of groups to be created or managed for users
+users_groups: []
+
+# Default shell for created users
+users_shell: /bin/bash
